@@ -1,6 +1,6 @@
 import pandas as pd
 import os
-from glob import glob
+from glob import glob  # todo: pathlib also has glob functionality, use that instead?
 import platform
 import tempfile
 import shutil
@@ -11,6 +11,7 @@ import numpy as np
 import SPR_to_ADLP_Functions
 import logging
 from _version import __version__
+import pathlib
 
 # Get the users Home Directory
 if platform.system() == "Windows":
@@ -337,6 +338,7 @@ def spr_create_dot_upload_file(config_file, save_file, clip, structures):
 
         try:
             # Get the original names of the ss and senso image directories
+            # TODO: change to be cross-platform with os.path or pathlib?
             if platform.system() == "Windows":
                 ss_img_dir_name = path_ss_img.split('\\')[-1]
                 senso_img_dir_name = path_senso_img.split('\\')[-1]
@@ -461,14 +463,21 @@ def spr_create_dot_upload_file(config_file, save_file, clip, structures):
                                                 df_ss_txt['Steady_State_Img'].str.split('_').str[-1]
 
                 # Add steady state image file path
-                # Need to replace /Volumes with //flynn
-                path_ss_img_edit = path_ss_img.replace('/Volumes', '//Iron')
-                df_final_for_dot['SS_IMG_ID'] = path_ss_img_edit + '/' + df_ss_txt['Steady_State_Img']
+                # previous lines commented out:
+                # path_ss_img_edit = path_ss_img.replace('/Volumes', '//Iron')
+                # df_final_for_dot['SS_IMG_ID'] = path_ss_img_edit + '/' + df_ss_txt['Steady_State_Img']
+
+                df_final_for_dot['SS_IMG_ID'] = \
+                    SPR_to_ADLP_Functions.common_functions.get_iron_server_path(path_ss_img) + df_ss_txt['Steady_State_Img']
 
                 # Add sensorgram image file path
                 # Need to replace /Volumes with //Iron
-                path_senso_img_edit = path_senso_img.replace('/Volumes', '//Iron')
-                df_final_for_dot['SENSO_IMG_ID'] = path_senso_img_edit + '/' + df_senso_txt['Senso_Img']
+                # old code commented out
+                # path_senso_img_edit = path_senso_img.replace('/Volumes', '//Iron')
+                # df_final_for_dot['SENSO_IMG_ID'] = path_senso_img_edit + '/' + df_senso_txt['Senso_Img']
+
+                df_final_for_dot['SENSO_IMG_ID'] = \
+                    SPR_to_ADLP_Functions.common_functions.get_iron_server_path(path_senso_img) + df_senso_txt['Senso_Img']
 
                 # Rearrange the columns for the final DataFrame (without images)
                 df_final_for_dot = df_final_for_dot.loc[:, ['BROAD_ID', 'STRUCTURES', 'PROJECT_CODE', 'CURVE_VALID',

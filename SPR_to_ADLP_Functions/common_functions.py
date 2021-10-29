@@ -9,6 +9,7 @@ import crypt
 import logging
 import platform
 import tempfile
+import pathlib
 
 
 def rep_item_for_dot_df(df, col_name, times_dup=3, sort=False):
@@ -526,5 +527,21 @@ def spr_binding_top_for_dot_file(report_pt_file, df_cmpd_set, instrument, fc_use
     logging.info('Finished calculating percent binding of compound at top concentration, proceeding...')
 
     return round(df_rpt_pts_trim['RelResp [RU]'], 2)
+
+
+def get_iron_server_path(root):
+
+    """Convert a local path from the config file to a posix path on the iron server for retrieving images, etc
+    This substitutes the root of the path with Iron/ and catenates any subsequent args. Returns a POSIX path string."""
+
+    tmp_path = pathlib.PurePath(root)
+    tmp_full = pathlib.PurePosixPath("Iron", *tmp_path.parts[1:])
+    # by using the tuple [1:] we drop either the drive letter in Windows, or the "volumes" part on Mac
+    # pass "Iron" as the first argument to get the correct network drive root
+    # then catenate on the remainder, ensuring it's a pure POSIX path i.e. forward slashes
+
+    return tmp_full.as_posix() + "/"
+    # unfortunately pathlib provides no way to return a path with a trailing space
+    # we always want a POSIX path though so manually add the trailing forward slash
 
 

@@ -246,13 +246,22 @@ def spr_create_dot_upload_file(config_file, save_file, clip, structures=False):
 
     # Add steady state image file path
     # Need to replace /Volumes with //Iron
-    path_ss_img_edit = path_ss_img.replace('/Volumes', '//Iron')
-    df_final_for_dot['SS_IMG_ID'] = path_ss_img_edit + '/' + df_ss_txt['Image File']
+    # Todo: The changes below currently fail the unit test because the test config files contain a path
+    # starting with .tests/ , the original code (str.replace) obviously just does nothing but the new function
+    # replaces the .tests part with "Iron" because it's more general
+    # old code commented out below
+    # path_ss_img_edit = path_ss_img.replace('/Volumes', '//Iron')
+    # df_final_for_dot['SS_IMG_ID'] = path_ss_img_edit + '/' + df_ss_txt['Image File']
+    df_final_for_dot['SS_IMG_ID'] = \
+        SPR_to_ADLP_Functions.common_functions.get_iron_server_path(path_ss_img) + df_ss_txt['Image File']
 
     # Add sensorgram image file path
     # Need to replace /Volumes with //Iron
-    path_senso_img_edit = path_senso_img.replace('/Volumes', '//Iron')
-    df_final_for_dot['SENSO_IMG_ID'] = path_senso_img_edit + '/' + df_senso_txt['Image File']
+    # path_senso_img_edit = path_senso_img.replace('/Volumes', '//Iron')
+    # df_final_for_dot['SENSO_IMG_ID'] = path_senso_img_edit + '/' + df_senso_txt['Image File']
+    df_final_for_dot['SENSO_IMG_ID'] = \
+        SPR_to_ADLP_Functions.common_functions.get_iron_server_path(path_senso_img) + df_senso_txt['Image File']
+
 
     # Add the Rmax_theoretical.
     # Note couldn't do this before as I needed to add protein MW and RU first.
